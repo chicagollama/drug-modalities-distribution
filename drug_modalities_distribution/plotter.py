@@ -12,7 +12,7 @@ class Plotter:
         self.dir = config.html_dir
         self.job = job
         self.font = dict(size=20)
-        self.template=config.template
+        self.template = config.template
 
     def html_file(self, title):
         return os.path.join(self.dir, f'{self.job}_{title.replace(" ", "_").replace("|", "_").replace(":", "_")}.html')
@@ -29,9 +29,11 @@ class Plotter:
         )
         fig.update_layout(
             font=self.font,
-            template=self.template
+            template=self.template,
         )
+        fig.update_traces(marker_size=20)
 
+        fig.write_html(self.html_file(title=title))
         fig.show()
         return fig
 
@@ -49,7 +51,9 @@ class Plotter:
         if no_labels:
             fig.update_traces(textinfo='none')
 
+        fig.write_html(self.html_file(title=title))
         fig.show()
+
         return fig
 
     def plot_hist(self, idf, title, nbins=None):
@@ -68,7 +72,6 @@ class Plotter:
             template=self.template
         )
 
-        # fig.write_html("test.html")
         fig.write_html(self.html_file(title=title))
         fig.show()
 
@@ -88,4 +91,29 @@ class Plotter:
             template=self.template
         )
 
+        fig.write_html(self.html_file(title=title))
         fig.show()
+
+        return fig
+
+    def plot_pivot(self, idf, title, params):
+        fig = px.scatter(
+            idf,
+            title=title,
+        )
+        fig.update_layout(
+            font=self.font,
+            template=self.template,
+            xaxis_title=params["xaxis_title"],
+            yaxis_title=params["yaxis_title"],
+            legend_title=params["legend_title"],
+            legend=dict(
+                yanchor="top",
+                xanchor="right",
+            )
+        )
+        fig.update_traces(marker_size=20)
+
+        fig.write_html(self.html_file(title=title))
+        fig.show()
+        return fig

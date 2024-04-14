@@ -8,10 +8,11 @@ import plotly.express as px
 from collections import Counter
 from common import Log
 import config as config
+from plotter import Plotter
 
 
 # Primary keys
-#['actionType', 'chemblIds', 'mechanismOfAction', 'references', 'targetName', 'targetType', 'targets']
+# ['actionType', 'chemblIds', 'mechanismOfAction', 'references', 'targetName', 'targetType', 'targets']
 
 
 ############################
@@ -19,7 +20,11 @@ import config as config
 ############################
 
 def parse_moa(mode="multi_target"):
-    dataset="moa"
+    dataset = "moa"
+    base_path = config.datasets_dir
+    dataset_dir = 'mechanismOfAction'
+    # Fields in final DataFrame
+    result = ['drugId', 'targetId']
 
     # Initiate logger
     log = Log(job=dataset)
@@ -29,20 +34,11 @@ def parse_moa(mode="multi_target"):
            f'{"#" * 100}\n\n'
     log.get_log(info=info)
 
-    base_path = config.datasets_dir
-    dataset_dir = 'mechanismOfAction'
-    # Fields in final DataFrame
-    result = ['drugId', 'targetId']
-
     # List all .json files in folder
     json_files = sorted([ijson for ijson in os.listdir(os.path.join(base_path, dataset_dir)) if ijson.endswith(".json")])
 
     # Setup counters and aggregate lists
-    count = 0
-    taken = 0
-    zero_targets = 0
-    targets_count = []
-    ijson = 0
+    count, taken, zero_targets, ijson = 0, 0, 0, 0
     alternative = []
 
     # define pandas Dataframe with the columns to get from the json
@@ -92,8 +88,6 @@ def parse_moa(mode="multi_target"):
                         taken += 1
                         dataset_df.loc[taken] = [drug_id, target_id]
 
-                    #TODO: delete, get info from df
-                    targets_count.append(len(targets))
                 else:
                     zero_targets += 1
 
@@ -101,10 +95,10 @@ def parse_moa(mode="multi_target"):
     before = len(dataset_df)
     dataset_df.drop_duplicates(inplace=True)
     after_deduplicate = len(dataset_df.index)
+
     # Drop rows with alternative forms of drugs
     dataset_df = dataset_df[~dataset_df['drugId'].isin(alternative)]
     after_pop_alternative = len(dataset_df.index)
-
 
     # Write csv with resulting df
     out_file = f'{os.path.join(config.results_dir, dataset)}.csv'
@@ -122,86 +116,28 @@ def parse_moa(mode="multi_target"):
 
     log.get_log(info=info)
 
-    targets_count_dict = dict(Counter(targets_count))
-
-    return dataset_df, info_df, targets_count_dict
+    return dataset_df, info_df
 
 
-#########
-# RUN
-#########
+def get_info():
+    # Get dataframe from initial dataset
+    # my_mode = "single_target"
+    dataset_df, info_df = parse_moa()
 
-# my_mode = "single_target"
+    # Get pivot
+    ag = info_df.groupby('numTargets').numDrugs.value_counts().sort_index()
+    pivot = ag.unstack()
 
-dataset_df, info_df, targets_count_dict = parse_moa()
+    # MoA: drugs/targets in initial entities
+    params = {"title": "MoA: drug to target ratio in initial items",
+              "xaxis_title": "Targets per 1 entity",
+              "yaxis_title": "Number of entities in MoA",
+              "legend_title": "Drugs per 1 entity"}
 
-
-##########
-# Pivot
-##########
-
-ag = info_df.groupby('numTargets').numDrugs.value_counts().sort_index()
-pivot = ag.unstack()
-# pivot.to_csv("moa_info.csv")
-
-########
-# PLOT
-########
-
-# Plot targets per drug distribution
-def histo_for_counter(counter: dict, title: str, x_title: str) -> None:
-    """ Get distribution by categories in list"""
-    # Turn to pandas dataframe
-    df = pd.DataFrame(dict(categories=counter.keys(), count=counter.values()))
-    # create figure
-    hb_fig = px.histogram(df, x='categories', y='count')
-    hb_fig.layout.template = "plotly_dark"
-    hb_fig.update_layout(
-            title=title,
-            xaxis_title=x_title,
-            yaxis_title='count',
-            font=dict(size=20),
-            bargap=0.2,  # gap between bars of adjacent location coordinates
-    )
-    hb_fig.update_xaxes(categoryorder='total descending')
-    hb_fig.update_traces(xbins_size=1)
-    hb_fig.show()
+    # Plot
+    plotter = Plotter(job="moa")
+    plotter.plot_pivot(idf=pivot, title="MoA: drug to target ratio in initial items", params=params)
 
 
-histo_for_counter(counter=targets_count_dict, title="MoA: Targets per drug distribution", x_title="number of targets")
-
-
-def simple_plot(pivot, params):
-    fig = px.scatter(pivot)
-    fig.update_traces(marker_size=20)
-    fig.layout.template = "plotly_dark"
-    fig.update_layout(
-        title=params["title"],
-        xaxis_title=params["xaxis_title"],
-        yaxis_title=params["yaxis_title"],
-        legend_title=params["legend_title"],
-        font=dict(
-            # family="Courier New, monospace",
-            size=20,
-            # color="RebeccaPurple"
-        )
-    )
-    fig.update_layout(legend=dict(
-        yanchor="top",
-        # y=0.99,
-        xanchor="right",
-        # x=0.01
-    ))
-
-    fig.show()
-
-# MoA: drugs/targets in initial entities
-params = {"title": "MoA: drug to target ratio in initial items",
-          "xaxis_title": "Targets per 1 entity",
-          "yaxis_title": "Number of entities in MoA",
-          "legend_title": "Drugs per 1 entity"}
-
-simple_plot(pivot, params)
-
-
-
+if __name__ == "__main__":
+    get_info()
