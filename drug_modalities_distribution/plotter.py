@@ -64,12 +64,15 @@ class Plotter:
             title=title,
             x=columns[0],
             y=columns[-1],
-            nbins=nbins
+            nbins=nbins,
         )
         fig.update_xaxes(categoryorder='total descending')
         fig.update_layout(
             font=self.font,
-            template=self.template
+            template=self.template,
+            bargap=0.2,
+            xaxis=dict(tickmode='linear')
+
         )
 
         fig.write_html(self.html_file(title=title))

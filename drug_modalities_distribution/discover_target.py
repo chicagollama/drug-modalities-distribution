@@ -10,6 +10,7 @@ from collections import Counter
 from subcellular_parse import SubcellularUniprot
 import config as config
 from common import Log
+from plotter import Plotter
 
 
 # Target primary keys
@@ -54,9 +55,6 @@ def parse_targets():
 
     # Setup counters and aggregate lists
     count = 0
-    zero_locs = []
-    zero_locs_biotypes = []
-    non_zero_locs_biotypes = []
     locations = []
     count_targets = 0
     count_locs = 0
@@ -68,7 +66,7 @@ def parse_targets():
     dataset_df = pd.DataFrame(columns=result)
 
     # Information about source data
-    info_df = pd.DataFrame(columns=['targetId', 'numLocations'])
+    info_df = pd.DataFrame(columns=['targetId', 'targetBiotype', 'numLocations'])
 
     # Iterate through all entities in all json files
     for index, js in enumerate(json_files):
@@ -76,7 +74,7 @@ def parse_targets():
         cursor = 0
         with open(os.path.join(base_path, dataset_dir, js), encoding="UTF-8") as json_file:
             for line_number, line in enumerate(json_file):
-                count +=1
+                count += 1
                 cursor += 1
                 print(f'json: {ijson}/{len(json_files)}, line: {cursor}, total parsed items: {count}')
 
@@ -86,6 +84,9 @@ def parse_targets():
 
                 # Main key
                 target_id = record['id']
+                target_biotype = record['biotype']
+                if record['biotype'] == '':
+                    target_biotype = 'NA'
 
                 # Check number of locations:
                 if 'subcellularLocations' in record.keys():
@@ -94,8 +95,7 @@ def parse_targets():
                     # Explore non-zero locations
                     if num_locations > 0:
                         # Keep info for common description of dataset
-                        non_zero_locs_biotypes.append(record['biotype'])
-                        info_df.loc[count] = [target_id, num_locations]
+                        info_df.loc[count] = [target_id, target_biotype, num_locations]
 
                         # Get all "non-standart" locations: not in Subcellular Uniprot codes
                         #TODO: do we need this information?
@@ -146,12 +146,10 @@ def parse_targets():
                                 dataset_df.loc[count_locs] = [record['id'], iterm, sc.translate(iterm), sc.get_cluster(iterm)]
 
                     else:
-                        zero_locs.append(record['id'])
-                        zero_locs_biotypes.append(record['biotype'])
+                        info_df.loc[count] = [target_id, target_biotype, num_locations]
                 else:
                     # Keep info about zero locations
-                    zero_locs.append(record['id'])
-                    zero_locs_biotypes.append(record['biotype'])
+                    info_df.loc[count] = [target_id, target_biotype, 0]
 
     # Write csv with resulting df
     out_file = log.write_csv(dataset_df=dataset_df)
@@ -160,7 +158,6 @@ def parse_targets():
     info = f'\n' \
            f'{count:,} total\n' \
            f'{locs_without_sl_code:,} locations subitems has no LS Uniprot code\n' \
-           f'{len(zero_locs_biotypes):,} zero locations\n' \
            f'{count_targets:,} targets with locations\n' \
            f'{count_locs:,} locations including multiple\n' \
            f'Resulting data in {out_file}\n\n\n'
@@ -173,81 +170,49 @@ def parse_targets():
     locations_counter = dict(Counter(sc.translate(loc) for loc in locations))
     # locations_df = pd.DataFrame(dict(biotype=[code2name[key] for key in locations_counter.keys()], numTargets=locations_counter.values()))
 
-    zero_counter = dict(Counter(zero_locs_biotypes))
-    # zero_df = pd.DataFrame(dict(biotype=zero_counter.keys(), numTargets=zero_counter.values()))
-
-    non_zero_counter = dict(Counter(non_zero_locs_biotypes))
-    # non_zero_df = pd.DataFrame(dict(biotype=non_zero_counter.keys(), numTargets=non_zero_counter.values()))
-
-    return info_df, dataset_df, zero_counter, non_zero_counter, locations_counter
+    return info_df, dataset_df, locations_counter
 
 
-########
-# RUN
-########
+def get_info():
+    ########
+    # RUN
+    ########
 
-# Get all data
-info_df, dataset_df, zero_counter, non_zero_counter, locations_counter = parse_targets()
-
-
-########
-# PLOT
-########
-
-# TODO: plot using Plotter class from plotter.py
-
-def histo_for_counter(counter: dict, title: str, x_title: str) -> None:
-    """ Get distribution by categories in list"""
-    # Turn to pandas dataframe
-    df = pd.DataFrame(dict(categories=counter.keys(), count=counter.values()))
-    # create figure
-    hb_fig = px.histogram(df, x='categories', y='count')
-    hb_fig.layout.template = "plotly_dark"
-    hb_fig.update_layout(
-            title=title,
-            xaxis_title=x_title,
-            yaxis_title='count',
-            font=dict(size=20)
-    )
-    hb_fig.update_xaxes(categoryorder='total descending')
-    hb_fig.show()
+    # Get all data
+    info_df, dataset_df, locations_counter = parse_targets()
 
 
-# Starting dataset
+    #################
+    # BIOTYPE
+    #################
 
-# All locations distribution
-histo_for_counter(counter=locations_counter, title="All target Locations", x_title="location")
+    biotype_nlocs = info_df.groupby(["targetBiotype", "numLocations"]).targetId.count().reset_index()
 
-# Zero location
-histo_for_counter(counter=zero_counter, title="Targets without locations", x_title="biotype")
+    plotter = Plotter(job="target")
 
-# Non-zero location
-histo_for_counter(counter=non_zero_counter, title="Targets with locations", x_title="biotype")
+    # Plot zero-location / biotype distribution
+    zero = biotype_nlocs[biotype_nlocs.numLocations == 0]
+    fig1 = plotter.plot_hist(idf=zero, title="Targets with zero locations")
 
-# Number of locations per target
-fig = px.histogram(info_df, x='numLocations')
-fig.layout.template = "plotly_dark"
-fig.update_layout(
-        title="Targets with locations data",
-        xaxis_title="number of locations per target",
-        yaxis_title="targets count",
-        font=dict(size=20),
-        bargap=0.2, # gap between bars of adjacent location coordinates
-        xaxis=dict(tickmode='linear')
-)
-fig.show()
+    # Plot nonzero-location / biotype distribution
+    non_zero = biotype_nlocs[biotype_nlocs.numLocations > 0]
+    # TODO: add single bar coloring for "protein_coding" (color_discrete_map={"protein_coding": "red"})
+    fig2 = plotter.plot_hist(idf=non_zero, title="Targets with non-zero locations")
+
+    #################
+    # LOCATIONS COUNT
+    #################
+
+    # Plot locations distribution
+    locations = info_df.groupby("numLocations").targetId.count().reset_index()
+    fig3 = plotter.plot_hist(idf=locations, title="Targets dataset: Locations count distribution", nbins=max(list(info_df.numLocations))+1)
+
+    locations_df = pd.DataFrame(dict(categories=locations_counter.keys(), count=locations_counter.values()))
+    fig4 = plotter.plot_hist(idf=locations_df, title="Targets dataset: Locations distribution hist")
+    fig5 = plotter.plot_pie_chart(idf=locations_df, title="Targets dataset: Locations distribution", no_labels=True)
+
+    return fig1, fig2, fig3, fig4, fig5
 
 
-# Resulting dataset (data taken)
-
-# Get pivot
-ag = dataset_df.groupby("targetLocationName", as_index=False).targetId.count()
-
-# Pie-chart for locations
-fig2 = px.pie(ag, values='targetId', names='targetLocationName', title='Locations distribution in target dataset')
-fig2.update_layout(
-    font=dict(size=20),
-    template = "plotly_dark"
-)
-fig2.update_traces(textinfo='none')
-fig2.show()
+if __name__ == "__main__":
+    get_info()

@@ -135,7 +135,9 @@ def get_info():
 
     # Plot
     plotter = Plotter(job="moa")
-    plotter.plot_pivot(idf=pivot, title="MoA: drug to target ratio in initial items", params=params)
+    fig = plotter.plot_pivot(idf=pivot, title="MoA: drug to target ratio in initial items", params=params)
+
+    return fig
 
 
 if __name__ == "__main__":
