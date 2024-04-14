@@ -50,7 +50,7 @@ def parse_targets():
     result = ['targetId', 'targetLocation', 'targetLocationName', 'targetLocationCluster']
 
     # List all .json files in folder
-    json_files = sorted([ijson for ijson in os.listdir(os.path.join(base_path, dataset_dir)) if ijson.endswith(".json")])[:1]
+    json_files = sorted([ijson for ijson in os.listdir(os.path.join(base_path, dataset_dir)) if ijson.endswith(".json")])
 
     # Setup counters and aggregate lists
     count = 0
