@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "drug-modalities-distribution"
 version = "0.1.0"
-description = ""
+description = "Tool for linking drug modality and target localization"
 authors = ["chicagollama <mariia.lomovskaia@gmail.com>"]
 readme = "README.md"
 
