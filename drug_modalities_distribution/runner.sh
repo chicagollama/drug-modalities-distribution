@@ -1,5 +1,6 @@
 #!/bin/bash
 
+mkdir ../results ../html
 rm ../results/*
 
 python3 discover_drug.py
