@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
 
-import os, io
+import os
+import io
 import pandas as pd
-import numpy as np
-import ijson
-import json
-import logging
-from datetime import datetime
 import config as config
 from common import Log
-import io
 
 
 # Run extraction for each ds

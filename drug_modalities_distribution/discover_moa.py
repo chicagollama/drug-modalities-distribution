@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import os, io
+import os
+import io
 import pandas as pd
 import json
 import plotly.express as px

@@ -1,4 +1,5 @@
-drug_modalities_distribution/datasets/
-drug_modalities_distribution/results/
-drug_modalities_distribution/html/
+datasets/
+results/
+html/
+drug_modalities_distribution/__pycache__/
 .idea/

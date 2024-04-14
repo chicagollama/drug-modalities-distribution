@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import os, io
+import os
+import io
 import pandas as pd
 import json
 import plotly.express as px
@@ -109,3 +110,7 @@ def get_info():
     fig2 = plotter.plot_pie_chart(idf=ag, title=f'{title}_pie')
 
     return fig1, fig2
+
+
+if __name__ == "__main__":
+    get_info()
