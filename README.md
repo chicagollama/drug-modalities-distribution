@@ -4,7 +4,7 @@
 
 ```python
 # Directory with all scripts
-cd src
+cd drug_modalities_distribution
 chmod +x runner.sh
 
 # Run all steps
