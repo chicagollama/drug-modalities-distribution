@@ -65,7 +65,7 @@ def parse_targets():
     ijson = 0
 
     # Define pandas Dataframe with the columns to get from the json
-    target_df = pd.DataFrame(columns=result)
+    dataset_df = pd.DataFrame(columns=result)
 
     # Information about source data
     info_df = pd.DataFrame(columns=['targetId', 'numLocations'])
@@ -143,7 +143,7 @@ def parse_targets():
                             count_targets += 1
                             for iterm in terms:
                                 count_locs += 1
-                                target_df.loc[count_locs] = [record['id'], iterm, sc.translate(iterm), sc.get_cluster(iterm)]
+                                dataset_df.loc[count_locs] = [record['id'], iterm, sc.translate(iterm), sc.get_cluster(iterm)]
 
                     else:
                         zero_locs.append(record['id'])
@@ -154,8 +154,7 @@ def parse_targets():
                     zero_locs_biotypes.append(record['biotype'])
 
     # Write csv with resulting df
-    out_file = f'{os.path.join(config.results_dir, dataset)}.csv'
-    target_df.to_csv(out_file, index=False)
+    out_file = log.write_csv(dataset_df=dataset_df)
 
     # Summary
     info = f'\n' \
@@ -169,7 +168,7 @@ def parse_targets():
     log.get_log(info=info)
 
     # Keep several data counters for illustartions
-    #TODO: Illustrate in place? Replace Counter for another DataFrame?
+    # TODO: Illustrate in place? Replace Counter for another DataFrame?
 
     locations_counter = dict(Counter(sc.translate(loc) for loc in locations))
     # locations_df = pd.DataFrame(dict(biotype=[code2name[key] for key in locations_counter.keys()], numTargets=locations_counter.values()))
@@ -180,7 +179,7 @@ def parse_targets():
     non_zero_counter = dict(Counter(non_zero_locs_biotypes))
     # non_zero_df = pd.DataFrame(dict(biotype=non_zero_counter.keys(), numTargets=non_zero_counter.values()))
 
-    return info_df, target_df, zero_counter, non_zero_counter, locations_counter
+    return info_df, dataset_df, zero_counter, non_zero_counter, locations_counter
 
 
 ########
@@ -188,14 +187,14 @@ def parse_targets():
 ########
 
 # Get all data
-info_df, target_df, zero_counter, non_zero_counter, locations_counter = parse_targets()
+info_df, dataset_df, zero_counter, non_zero_counter, locations_counter = parse_targets()
 
 
 ########
 # PLOT
 ########
 
-#TODO: plot using Plotter class from plotter.py
+# TODO: plot using Plotter class from plotter.py
 
 def histo_for_counter(counter: dict, title: str, x_title: str) -> None:
     """ Get distribution by categories in list"""
@@ -242,7 +241,7 @@ fig.show()
 # Resulting dataset (data taken)
 
 # Get pivot
-ag = target_df.groupby("targetLocationName", as_index=False).targetId.count()
+ag = dataset_df.groupby("targetLocationName", as_index=False).targetId.count()
 
 # Pie-chart for locations
 fig2 = px.pie(ag, values='targetId', names='targetLocationName', title='Locations distribution in target dataset')

@@ -70,8 +70,7 @@ def parse_drug():
                     failed.append(drug_id)
 
     # Write csv with resulting df
-    out_file = f'{os.path.join(config.results_dir, dataset)}.csv'
-    dataset_df.to_csv(out_file, index=False)
+    out_file = log.write_csv(dataset_df=dataset_df)
 
     # Summary
     info = f'\n' \

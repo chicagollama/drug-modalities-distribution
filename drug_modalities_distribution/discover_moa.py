@@ -101,8 +101,7 @@ def parse_moa(mode="multi_target"):
     after_pop_alternative = len(dataset_df.index)
 
     # Write csv with resulting df
-    out_file = f'{os.path.join(config.results_dir, dataset)}.csv'
-    dataset_df.to_csv(out_file, index=False)
+    out_file = log.write_csv(dataset_df=dataset_df)
 
     # Summary
     info = f'\n' \

@@ -20,6 +20,11 @@ class Log:
         print(info)
         return info
 
+    def write_csv(self, dataset_df):
+        out_file = f'{os.path.join(config.results_dir, self.job)}.csv'
+        dataset_df.to_csv(out_file, index=False)
+        return out_file
+
     @staticmethod
     def write_list_to_file(filename, datalist):
         with open(f'{filename}.txt', 'w') as outfile:
