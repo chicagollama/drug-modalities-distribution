@@ -97,26 +97,3 @@ class Plotter:
         # fig.show()
 
         return fig
-
-    def plot_pivot(self, idf, title, params):
-        fig = px.scatter(
-            idf,
-            title=title,
-        )
-        fig.update_layout(
-            font=self.font,
-            template=self.template,
-            xaxis_title=params["xaxis_title"],
-            yaxis_title=params["yaxis_title"],
-            legend_title=params["legend_title"],
-            legend=dict(
-                yanchor="top",
-                xanchor="right",
-            )
-        )
-        fig.update_traces(marker_size=20)
-
-        fig.write_html(self.html_file(title=title))
-        # fig.show()
-
-        return fig

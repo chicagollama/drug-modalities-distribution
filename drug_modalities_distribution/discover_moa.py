@@ -124,18 +124,20 @@ def get_info():
     dataset_df, info_df = parse_moa()
 
     # Get pivot
-    ag = info_df.groupby('numTargets').numDrugs.value_counts().sort_index()
-    pivot = ag.unstack()
-
-    # MoA: drugs/targets in initial entities
-    params = {"title": "MoA: drug to target ratio in initial items",
-              "xaxis_title": "Targets per 1 entity",
-              "yaxis_title": "Number of entities in MoA",
-              "legend_title": "Drugs per 1 entity"}
+    ag = info_df.groupby('numTargets').numDrugs.value_counts().sort_index().reset_index()
+    ag["numDrugs"] = ag["numDrugs"].astype(str)
 
     # Plot
     plotter = Plotter(job="moa")
-    fig = plotter.plot_pivot(idf=pivot, title="MoA: drug to target ratio in initial items", params=params)
+    # MoA: drugs/targets in initial entities
+    params = {"xaxis_title": "Targets per 1 entity",
+              "yaxis_title": "Number of items",
+              "legend_title": "Drugs per 1 entity"}
+
+    fig = plotter.plot_scatter(idf=ag, log_y=False,
+                               title="MoA: drug to target ratio in initial items")
+    fig.update_layout(params)
+    # fig.show()
 
     return fig
 
