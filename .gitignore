@@ -1,5 +1,6 @@
 datasets/
 results/
+example/
 html/
 drug_modalities_distribution/__pycache__/
 __pycache__/
