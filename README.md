@@ -61,3 +61,25 @@ Datasets used: Target, Drug, Drug - mechanism of action; Subcellular from Unipro
 
 All intermediate data is stored at result dir as .csv files.
 
+
+## TODO
+
+### Findings
+- [ ]  Add text description to figures
+
+### Algorithmic
+Optimize locations selections:
+- [ ]  Weights cut-off
+- [ ]  Surfaceome data
+
+### Technical
+- [ ]  Add option for DataFrame download from intermediate .csv 
+- [ ]  Add download datasets to runners
+- [ ]  Add tests
+- [ ]  Add developer mode
+- [ ]  Switch to PostgreSQL saving data vs. csv-files
+
+### Visualization
+- [ ]  Subplots for location/cluster fig10-fig11
+- [ ]  Set colors on sunburst plots
+
