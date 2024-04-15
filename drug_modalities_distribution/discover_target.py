@@ -192,12 +192,12 @@ def get_info():
 
     # Plot zero-location / biotype distribution
     zero = biotype_nlocs[biotype_nlocs.numLocations == 0]
-    fig1 = plotter.plot_hist(idf=zero, title="Targets with zero locations")
+    fig1 = plotter.plot_hist(idf=zero, title="Targets dataset: Targets with zero locations")
 
     # Plot nonzero-location / biotype distribution
     non_zero = biotype_nlocs[biotype_nlocs.numLocations > 0]
     # TODO: add single bar coloring for "protein_coding" (color_discrete_map={"protein_coding": "red"})
-    fig2 = plotter.plot_hist(idf=non_zero, title="Targets with non-zero locations")
+    fig2 = plotter.plot_hist(idf=non_zero, title="Targets dataset: Targets with non-zero locations")
 
     #################
     # LOCATIONS COUNT

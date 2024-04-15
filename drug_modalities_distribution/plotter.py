@@ -34,7 +34,7 @@ class Plotter:
         fig.update_traces(marker_size=20)
 
         fig.write_html(self.html_file(title=title))
-        fig.show()
+        # fig.show()
         return fig
 
     def plot_pie_chart(self, idf, title, no_labels=False):
@@ -52,7 +52,7 @@ class Plotter:
             fig.update_traces(textinfo='none')
 
         fig.write_html(self.html_file(title=title))
-        fig.show()
+        # fig.show()
 
         return fig
 
@@ -76,7 +76,7 @@ class Plotter:
         )
 
         fig.write_html(self.html_file(title=title))
-        fig.show()
+        # fig.show()
 
         return fig
 
@@ -95,7 +95,7 @@ class Plotter:
         )
 
         fig.write_html(self.html_file(title=title))
-        fig.show()
+        # fig.show()
 
         return fig
 
@@ -118,5 +118,6 @@ class Plotter:
         fig.update_traces(marker_size=20)
 
         fig.write_html(self.html_file(title=title))
-        fig.show()
+        # fig.show()
+
         return fig

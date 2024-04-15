@@ -9,6 +9,8 @@ readme = "README.md"
 python = "^3.9"
 pandas = "^2.2.2"
 plotly = "^5.20.0"
+dash = "^2.16.1"
+flask = "^3.0.3"
 
 
 [build-system]
