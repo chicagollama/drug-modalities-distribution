@@ -25,16 +25,6 @@ class DMD:
 
         # Get plotter
         self.plotter = Plotter(job="dmd")
-        # self.color_map_cluster = {'Surface': 'blue', 'Cytoplasm': 'red', 'Nucleus': 'green', 'Secreted': 'purple'}
-        self.plotly_colors = px.colors.qualitative.Plotly
-        # self.color_map_modality = {'Small molecule': 'blue', 'Antibody': 'red', 'Protein': 'green',
-        #                            'Unknown': 'grey', 'Oligonucleotide': 'purple', 'Oligosccharide': 'orange',
-        #                            'Enzyme': 'cyan', 'Gene': 'magenta', 'Cell': 'light green'}
-        self.modalities = ('Small molecule', 'Antibody', 'Protein', 'Unknown', 'Oligonucleotide', 'Oligosccharide',
-                           'Enzyme', 'Gene', 'Cell')
-        self.color_map_modality = {self.modalities[_]: self.plotly_colors[_] for _ in range(len(self.modalities))}
-        self.cluster_list = ('Surface', 'Cytoplasm', 'Nucleus', 'Secreted')
-        self.color_map_cluster = {self.cluster_list[_]: self.plotly_colors[_] for _ in range(len(self.cluster_list))}
 
     def df_info(self):
         info = f'\n' \
@@ -70,7 +60,7 @@ class DMD:
         # Group: targetLocationCluster | drugId
         all_clusters = self.df.groupby('targetLocationCluster', as_index=False).drugId.count()
         fig3 = self.plotter.plot_pie_chart(idf=all_clusters,
-                                           color_map=self.color_map_cluster,
+                                           color_map="cluster",
                                            title="Fig. 3. Clusters counted for all locations without reduction")
 
         # Group: targetLocationCluster | targetLocationName
@@ -101,7 +91,7 @@ class DMD:
 
         # Label all for location count & MLP flag
         # Add location count and get MLP status for all drugs
-        df_with_mlp = pd.merge(self.df, mlp_all_df, on = "drugId")
+        df_with_mlp = pd.merge(self.df, mlp_all_df, on="drugId")
         df_with_mlp["multipleLocations"] = df_with_mlp.apply(lambda row: "ML" if row.locationCount > 1 else "SL", axis=1)
 
         # Group by MLP | targetLocationName
@@ -131,14 +121,14 @@ class DMD:
         # Circle for Clusters | All drugs
         clusters_all_relative = clust_count.groupby('targetLocationCluster').drugId.count().reset_index()
         fig8 = self.plotter.plot_pie_chart(idf=clusters_all_relative,
-                                           color_map=self.color_map_cluster,
+                                           color_map="cluster",
                                            title="Fig. 8. Clusters distribution | All drugs | Locations reduced to clusters")
 
         # >>> Compare to non-reduced:
         # >>> Clusters counted for all locations without reduction
         # >>> Group: targetLocationCluster | drugId
         all_clusters = self.df.groupby('targetLocationCluster', as_index=False).drugId.count()
-        fig81 = self.plotter.plot_pie_chart(idf=all_clusters, color_map=self.color_map_cluster,
+        fig81 = self.plotter.plot_pie_chart(idf=all_clusters, color_map="cluster",
                                             title="(Fig. 3.) Clusters counted for all locations without reduction")
 
         return fig8, fig81
@@ -189,7 +179,7 @@ class DMD:
             modality_avclust = av_clust[av_clust.drugType == itype].reset_index()
             plot_modality_avclust = modality_avclust.groupby('singleClust').drugId.count().reset_index()
             fig10 = self.plotter.plot_pie_chart(idf=plot_modality_avclust,
-                                                color_map=self.color_map_cluster,
+                                                color_map="cluster",
                                                 title=f'Fig. 10.{len(figs) + 1}. Average cluster | {itype}')
             figs.append(fig10)
 
@@ -211,7 +201,7 @@ class DMD:
             cluster_avclust = av_clust[av_clust.singleClust == iclust].reset_index()
             plot_cluster_avclust = cluster_avclust.groupby('drugType').drugId.count().reset_index()
             fig11 = self.plotter.plot_pie_chart(idf=plot_cluster_avclust,
-                                                color_map=self.color_map_modality,
+                                                color_map="modality",
                                                 title=f'Fig. 11.{len(figs) + 1} Average cluster | {iclust}')
             figs.append(fig11)
         return figs

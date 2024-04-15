@@ -188,6 +188,7 @@ def get_info():
 
     biotype_nlocs = info_df.groupby(["targetBiotype", "numLocations"]).targetId.count().reset_index()
 
+    # Get plotter
     plotter = Plotter(job="target")
 
     # Plot zero-location / biotype distribution
@@ -209,7 +210,9 @@ def get_info():
 
     locations_df = pd.DataFrame(dict(categories=locations_counter.keys(), count=locations_counter.values()))
     fig4 = plotter.plot_hist(idf=locations_df, title="Targets dataset: Locations distribution hist")
-    fig5 = plotter.plot_pie_chart(idf=locations_df, title="Targets dataset: Locations distribution", no_labels=True)
+    fig5 = plotter.plot_pie_chart(idf=locations_df,
+                                  title="Targets dataset: Locations distribution",
+                                  color_map="cluster")
 
     return fig1, fig2, fig3, fig4, fig5
 

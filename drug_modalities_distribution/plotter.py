@@ -14,6 +14,24 @@ class Plotter:
         self.font = dict(size=20)
         self.template = config.template
 
+        # Set color scheme for drug modalities & target locations clusters
+        # To plot same colors for different tasks & compare easily
+        self.plotly_colors = px.colors.qualitative.Plotly
+        self.modalities = ('Small molecule', 'Antibody', 'Protein', 'Unknown', 'Oligonucleotide', 'Oligosccharide',
+                           'Enzyme', 'Gene', 'Cell')
+        self.color_map_modality = {self.modalities[_]: self.plotly_colors[_] for _ in range(len(self.modalities))}
+        self.cluster_list = ('Surface', 'Cytoplasm', 'Nucleus', 'Secreted')
+        self.color_map_cluster = {self.cluster_list[_]: self.plotly_colors[_] for _ in range(len(self.cluster_list))}
+
+    def get_colors(self, option):
+        """Choose the color map"""
+        map = None
+        if option == "cluster":
+            map = self.color_map_cluster
+        elif option == "modality":
+            map = self.color_map_modality
+        return map
+
     def html_file(self, title):
         return os.path.join(self.dir, f'{self.job}_{title.replace(" ", "_").replace("|", "_").replace(":", "_")}.html')
 
@@ -37,19 +55,33 @@ class Plotter:
         # fig.show()
         return fig
 
-    def plot_pie_chart(self, idf, title,  color_map='Pastel2', no_labels=False):
+    def plot_pie_chart(self, idf, title,  color_map=None, no_labels=False):
         columns = list(idf.columns)
-        fig = px.pie(
-            idf,
-            values=columns[1],
-            names=columns[0],
-            title=title,
-            color=columns[0],
-            color_discrete_map=color_map,
-        )
+
+        if color_map:
+            fig = px.pie(
+                idf,
+                values=columns[1],
+                names=columns[0],
+                title=title,
+                color=columns[0],
+                color_discrete_map=self.get_colors(color_map),
+            )
+
+        else:
+            fig = px.pie(
+                idf,
+                values=columns[1],
+                names=columns[0],
+                title=title,
+            )
+
         fig.update_layout(
+            title=title,
             font=self.font,
-            template=self.template
+            template=self.template,
+            uniformtext_minsize=20,
+            uniformtext_mode='hide'
         )
         fig.update_traces(textposition='inside', textinfo='percent+label')
 

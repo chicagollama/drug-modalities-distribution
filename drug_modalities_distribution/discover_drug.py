@@ -4,7 +4,6 @@ import os
 import io
 import pandas as pd
 import json
-import plotly.express as px
 from common import Log
 import config as config
 from plotter import Plotter
@@ -97,6 +96,7 @@ def get_info():
 
     # Initiate Plotter class
     plotter = Plotter(job='drug')
+    # Get color schemes from Plotter
 
     # Drug type distribution
     title = 'Drug modalities in starting dataset'
@@ -105,7 +105,8 @@ def get_info():
     fig1 = plotter.plot_hist(idf=ag, title=f'{title}_hist')
 
     # Plot pie-chart
-    fig2 = plotter.plot_pie_chart(idf=ag, title=f'{title}_pie')
+    fig2 = plotter.plot_pie_chart(idf=ag, color_map="modality",
+                                  title=f'{title}_pie')
 
     return fig1, fig2
 

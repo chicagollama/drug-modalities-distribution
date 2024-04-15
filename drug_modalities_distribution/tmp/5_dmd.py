@@ -38,6 +38,7 @@ layout = html.Div([
     html.H3('DMD info'),
     html.Div([
         dcc.Graph(figure=fig1, responsive=True, style={'height': fig_height}), ]),
+    html.P("Some text", style={"width": "40%"}),
     html.Div([
         dcc.Graph(figure=fig2, responsive=True, style={'height': fig_height}), ]),
     html.Div([
