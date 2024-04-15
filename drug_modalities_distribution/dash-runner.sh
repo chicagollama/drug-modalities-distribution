@@ -1,7 +1,6 @@
 #!/bin/bash
 
 mkdir ../results ../html
-rm ../results/*
 
 python3 dash-app.py
 python3 dash-app-dmd.py

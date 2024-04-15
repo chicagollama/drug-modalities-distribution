@@ -11,7 +11,7 @@ chmod +x dash-runner.sh
 
 # Run all steps
 # Provides html pages on ports 8050 & 8051
-./runner.sh 
+./dash-runner.sh 
 
 # Step by step
 
