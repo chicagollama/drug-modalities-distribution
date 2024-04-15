@@ -15,8 +15,7 @@ from plotter import Plotter
 ############################
 
 def parse_drug():
-    # temp for test
-    dataset="drug"
+    dataset = "drug"
 
     # Initiate logger
     log = Log(job=dataset)

@@ -2,6 +2,31 @@
 
 ## Usage
 
+### Dash (preferable)
+
+```python
+# Directory with all scripts
+cd drug_modalities_distribution
+chmod +x dash-runner.sh
+
+# Run all steps
+# Provides html pages on ports 8050 & 8051
+./runner.sh 
+
+# Step by step
+
+# Extract data from datasets and get some info
+# Provides html page on port 8050
+python3 dash-app.py
+
+# Analisys & visualization of merged data
+# Provides html page on port 8051
+python3 dash-app-dmd.py
+```
+
+
+### No dash
+
 ```python
 # Directory with all scripts
 cd drug_modalities_distribution
@@ -27,6 +52,7 @@ merge.py
 # Analisys & visualization of merged data, provides multiple plots
 merged2plot.py
 ```
+
 ## Data
 
 Datasets must be located at datasets directory unpacked. 

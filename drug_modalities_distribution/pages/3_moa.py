@@ -20,7 +20,7 @@ fig = get_info()
 fig_height = '900px'
 
 
-dash.register_page(__name__)
+dash.register_page(__name__, order=3)
 
 layout = html.Div([
     html.H3('MoA info'),

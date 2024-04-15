@@ -17,7 +17,7 @@ class Plotter:
     def html_file(self, title):
         return os.path.join(self.dir, f'{self.job}_{title.replace(" ", "_").replace("|", "_").replace(":", "_")}.html')
 
-    def plot_scatter(self, idf, title):
+    def plot_scatter(self, idf, title, log_y=True):
         columns = list(idf.columns)
         fig = px.scatter(
             idf,
@@ -25,7 +25,7 @@ class Plotter:
             x=columns[0],
             y=columns[2],
             color=columns[1],
-            log_y=True
+            log_y=log_y
         )
         fig.update_layout(
             font=self.font,
@@ -57,7 +57,6 @@ class Plotter:
         return fig
 
     def plot_hist(self, idf, title, nbins=None):
-        print(title)
         columns = list(idf.columns)
         fig = px.histogram(
             idf,

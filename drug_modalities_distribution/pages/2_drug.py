@@ -19,7 +19,7 @@ sys.path.append(parent_dir)
 fig1, fig2 = get_info()
 fig_height = '900px'
 
-dash.register_page(__name__)
+dash.register_page(__name__, order=2)
 
 layout = html.Div([
     html.H3('Drug info'),

@@ -7,54 +7,58 @@ import config as config
 from common import Log
 
 
-# Run extraction for each ds
+def get_merged():
+       # Run extraction for each ds
 
-# Prepared subsets in csv files
-csv_path = config.results_dir
+       # Prepared subsets in csv files
+       csv_path = config.results_dir
 
-# drug
-infile = os.path.join(csv_path, f'drug.csv')
-df_drug = pd.read_csv(infile)
-
-
-# moa
-infile = os.path.join(csv_path, f'moa.csv')
-df_moa = pd.read_csv(infile)
+       # drug
+       infile = os.path.join(csv_path, f'drug.csv')
+       df_drug = pd.read_csv(infile)
 
 
-# target
-infile = os.path.join(csv_path, f'target.csv')
-df_target = pd.read_csv(infile)
-# df_target = df_target.drop_duplicates()
+       # moa
+       infile = os.path.join(csv_path, f'moa.csv')
+       df_moa = pd.read_csv(infile)
 
 
-# Get merged table
-# Merge molecule and moa
-merge_drug_to_moa = pd.merge(df_drug, df_moa, on="drugId")
+       # target
+       infile = os.path.join(csv_path, f'target.csv')
+       df_target = pd.read_csv(infile)
+       # df_target = df_target.drop_duplicates()
 
-# Merge result with target
-merge_molecule_to_moa_to_target = pd.merge(merge_drug_to_moa, df_target, how="inner", on="targetId")
-buf = io.StringIO()
-merge_molecule_to_moa_to_target.info(buf=buf)
-df_info = buf.getvalue()
 
-# Write merged to csv
-out_file = f'{os.path.join(config.results_dir, "merged")}.csv'
-merge_molecule_to_moa_to_target.to_csv(out_file, index=False)
+       # Get merged table
+       # Merge molecule and moa
+       merge_drug_to_moa = pd.merge(df_drug, df_moa, on="drugId")
 
-# Show and log Summary info
-# Initiate logger
-log = Log(job='merge')
+       # Merge result with target
+       merge_molecule_to_moa_to_target = pd.merge(merge_drug_to_moa, df_target, how="inner", on="targetId")
+       buf = io.StringIO()
+       merge_molecule_to_moa_to_target.info(buf=buf)
+       df_info = buf.getvalue()
 
-info = f'\n' \
-       f'{"#" * 100}\n\n' \
-       f'MERGED datasets to DMD!\n\n' \
-       f'{"#" * 100}\n\n' \
-       f'Resulting data in {out_file}\n\n' \
-       f'Summary dataset info:\n' \
-       f'{df_info}\n\n\n'
+       # Write merged to csv
+       out_file = f'{os.path.join(config.results_dir, "merged")}.csv'
+       merge_molecule_to_moa_to_target.to_csv(out_file, index=False)
 
-log.get_log(info=info)
+       # Show and log Summary info
+       # Initiate logger
+       log = Log(job='merge')
 
-# f'Summary dataset:\n' \
-# f'{merge_molecule_to_moa_to_target}\n' \
+       info = f'\n' \
+              f'{"#" * 100}\n\n' \
+              f'MERGED datasets to DMD!\n\n' \
+              f'{"#" * 100}\n\n' \
+              f'Resulting data in {out_file}\n\n' \
+              f'Summary dataset info:\n' \
+              f'{df_info}\n\n\n'
+
+       log.get_log(info=info)
+
+       return info
+
+
+if __name__ == "__main__":
+       get_merged()

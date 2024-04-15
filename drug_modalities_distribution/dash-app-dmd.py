@@ -2,7 +2,7 @@ import dash
 from dash import Dash, html, dcc
 
 
-app = Dash(__name__, use_pages=True)
+app = Dash(__name__, use_pages=True, pages_folder="tmp")
 
 app.layout = html.Div([
     html.H1('Info'),
@@ -16,4 +16,5 @@ app.layout = html.Div([
 
 
 if __name__ == '__main__':
+    app.run(port=8051)
     app.run()
