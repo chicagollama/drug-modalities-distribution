@@ -2,4 +2,5 @@ datasets/
 results/
 html/
 drug_modalities_distribution/__pycache__/
+__pycache__/
 .idea/
