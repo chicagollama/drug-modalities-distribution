@@ -37,17 +37,24 @@ class Plotter:
         # fig.show()
         return fig
 
-    def plot_pie_chart(self, idf, title, no_labels=False):
+    def plot_pie_chart(self, idf, title,  color_map='Pastel2', no_labels=False):
         columns = list(idf.columns)
         fig = px.pie(
             idf,
             values=columns[1],
             names=columns[0],
-            title=title)
+            title=title,
+            color=columns[0],
+            color_discrete_map=color_map,
+        )
         fig.update_layout(
             font=self.font,
             template=self.template
         )
+        fig.update_traces(textposition='inside', textinfo='percent+label')
+
+        fig.update_traces(hole=.4)
+
         if no_labels:
             fig.update_traces(textinfo='none')
 
